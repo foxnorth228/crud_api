@@ -1,3 +1,12 @@
 import "dotenv/config";
-import * as http from "http";
-console.log(process.env.PORT, "22")
+import { Server, createServer } from "http";
+
+const app: Server = createServer();
+app.on("request", (req, res) => {
+    console.log(req.url);
+    res.writeHead(404, {
+        "Content-Type": "text/json"
+    });
+    res.end(JSON.stringify({}));
+});
+app.listen(process.env.PORT);
