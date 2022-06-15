@@ -50,11 +50,20 @@ class Test {
                 return;
             }
             for (let i = 0; i < answer.length; ++i) {
-                if (arr[i] === answer[i]) {
-                    continue;
+                if(arr[i] instanceof Object) {
+                    if (isEqual(arr[i] as Object, answer[i])) {
+                        continue;
+                    } else {
+                        Test.failedTestElement(arr, answer, i);
+                        return;
+                    }
                 } else {
-                    Test.failedTestElement(arr, answer, i);
-                    return;
+                    if (arr[i] === answer[i]) {
+                        continue;
+                    } else {
+                        Test.failedTestElement(arr, answer, i);
+                        return;
+                    }
                 }
             }
             Test.succeedTest();
@@ -129,23 +138,16 @@ checkIfServerWork();
 //negativeTests();
 Test.endMessage();
 
-/*function isEqual(object1, object2) {
-  const props1 = Object.getOwnPropertyNames(object1);
-  const props2 = Object.getOwnPropertyNames(object2);
-
-  if (props1.length !== props2.length) {
-    return false;
-  }
-
-  for (let i = 0; i < props1.length; i += 1) {
-    const prop = props1[i];
-    const bothAreObjects = typeof(object1[prop]) === 'object' && typeof(object2[prop]) === 'object';
-
-    if ((!bothAreObjects && (object1[prop] !== object2[prop]))
-    || (bothAreObjects && !isEqual(object1[prop], object2[prop]))) {
-      return false;
+function isEqual(object1: object, object2: object): Boolean {
+    const keys1: Array<string> = Object.keys(object1);
+    const keys2 = Object.keys(object2);
+    const values1 = Object.values(object1);
+    const values2 = Object.values(object2);
+    if (keys1.length !== keys2.length) {
+        return false;
     }
-  }
-
+    for (let key1 in object1) {
+        console.log(key1);
+    }
   return true;
-}*/
+}
