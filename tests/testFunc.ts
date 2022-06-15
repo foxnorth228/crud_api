@@ -8,7 +8,7 @@ interface IStatus {
 }
 
 async function sendRequestToServer(hostname: string="localhost", port:number=3000, 
-    path: string="api/users", method: string): Promise<[number, object]> {
+    path: string="api/users", method: string, object: object): Promise<[number, object]> {
     const options = {
       method: method,
       headers: {
@@ -17,11 +17,11 @@ async function sendRequestToServer(hostname: string="localhost", port:number=300
     };
     const url = `http://${hostname}:${port}/${path}`;
     //const answer = await fetch(url, { method: method }) as IStatus;
-    const answer = await getResponsefromServer(url, options);
+    const answer = await getResponsefromServer(url, options, object);
     return answer;
 }
 
-async function getResponsefromServer(url: string, options: object): Promise<[number, object]> {
+async function getResponsefromServer(url: string, options: object, object: object): Promise<[number, object]> {
     return new Promise(resolve => {
       const req = request(url, options, async (res) => {
           let chunks = ""; 
@@ -34,7 +34,7 @@ async function getResponsefromServer(url: string, options: object): Promise<[num
             resolve([res.statusCode as number, JSON.parse(chunks)]);
           });
       });
-      req.write(JSON.stringify({a: 2}));
+      req.write(JSON.stringify(object));
       req.end();
     })
 }
@@ -63,6 +63,6 @@ async function readResponseBody(body: ReadableStream): Promise<object> {
 
 export async function testRequestFunc(method: string="GET", object: object={},
  path: string="api/users"): Promise<[number, object]> {
-    const [status, body] = await sendRequestToServer("localhost", 3000, path, method);
+    const [status, body] = await sendRequestToServer("localhost", 3000, path, method, object);
     return [status, body];
 }

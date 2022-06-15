@@ -2,17 +2,31 @@ import { v4, validate } from "uuid";
 import { URL } from "url";
 
 const route: object = {
-    "/users/api/:uuid": processUsersApiID,
-    "/users/api": processUsersApi,
+    "/api/users/:{uuid}": processUsersApiID,
+    "/api/users": processUsersApi,
 };
+
+const splitRoutes: Array<Array<string>> = [];
 
 export async function processRequest(url: string, method: string, body: object) {
     console.log(url, method, body);
+    await shareURL(url);
 }
 
-function shareURL(url: string, method: string, body: object) {
-
+async function shareURL(url: string) {
+    const elemsOfURL = url.split("/").slice(1);
+    console.log(JSON.stringify(elemsOfURL));
+    let checkString = "";
+    let arrUrls = Object.keys(route);
+    for await (let elem of elemsOfURL) {
+        checkString += "/" + elem;
+        arrUrls = arrUrls.filter((el) => {
+            return el.startsWith(checkString);
+        });
+    }
+    console.log(arrUrls);
 }
+
 
 interface IUser {
     id: string;

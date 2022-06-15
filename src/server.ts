@@ -36,11 +36,9 @@ async function getbody(res: IncomingMessage): Promise<Object> {
         let chunks = ""; 
         res.setEncoding('utf8');
         res.on('data', (chunk) => {
-            console.log(chunk)
             chunks += chunk;
         })
         res.on('end', () => {
-            console.log(chunks);
             resolve(JSON.parse(chunks))
         });
     });

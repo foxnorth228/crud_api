@@ -1,36 +1,32 @@
 import { testRequestFunc } from "./testFunc.js";
 import { v4 } from "uuid";
 
-
-
 type basicTypes = boolean | number | string | object;
 
 class Test {
-    private static numTests = 1;
+    private static numTests = 0;
     private static succeedTests = 0;
     private static failedTests = 0;
 
-    private static failedTestElement(arr: basicTypes[], answer: basicTypes[], num: number) {
+    private static async failedTestElement(arr: basicTypes[], answer: basicTypes[], num: number) {
         console.log("***");
         console.log(`Test ${Test.numTests} failed`);
         console.log(`${arr.join(", ")} is not like ${answer.join(", ")}`);
         console.log(`${JSON.stringify(arr[num])} is not like ${JSON.stringify(answer[num])}`);
         console.log("***");
-        Test.numTests++;
         Test.failedTests++;
     }
 
-    private static failedTestCount(arr: basicTypes[], answer: basicTypes[]) {
+    private static async failedTestCount(arr: basicTypes[], answer: basicTypes[]) {
         console.log("***");
         console.log(`Test ${Test.numTests} failed`);
         console.log(`Number of testing elements is ${arr.length}, but number elements in answer is ${answer.length}`);
         console.log("***");
-        Test.numTests++;
         Test.failedTests++;
     }
 
-    private static succeedTest() {
-        Test.numTests++;
+    private static async succeedTest() {
+        console.log(`Test ${Test.numTests} succeed`);
         Test.succeedTests++;
     }
 
@@ -43,8 +39,10 @@ class Test {
     }
 
     static async testAsyncFunction(func: Function, arr: basicTypes[], ...args: basicTypes[]) {
+        Test.numTests++;
         try { 
             const answer = await func(...args); 
+            console.log(JSON.stringify(arr), JSON.stringify(answer));
             if (answer.length != arr.length) {
                 Test.failedTestCount(arr, answer);
                 return;
@@ -54,14 +52,14 @@ class Test {
                     if (isEqual(arr[i] as Object, answer[i])) {
                         continue;
                     } else {
-                        Test.failedTestElement(arr, answer, i);
+                        await Test.failedTestElement(arr, answer, i);
                         return;
                     }
                 } else {
                     if (arr[i] === answer[i]) {
                         continue;
                     } else {
-                        Test.failedTestElement(arr, answer, i);
+                        await Test.failedTestElement(arr, answer, i);
                         return;
                     }
                 }
@@ -73,15 +71,15 @@ class Test {
         }
     }
 
-    static async endMessage() {
+    /*static async endMessage() {
         console.log(`\nAll number of tests: ${Test.numTests}, \nSuccessful tests: ${Test.succeedTests}`);
         console.log(`Failed tests: ${Test.failedTests}`);
-    }
+    }*/
 }
 
 async function checkIfServerWork() {
     await Test.testAsyncFunction(testRequestFunc, [404, {}], "GET");
-    await Test.testAsyncFunction(testRequestFunc, [404, {}], "POST", {});
+    await Test.testAsyncFunction(testRequestFunc, [404, {}], "POST", {aaa: 222});
 }
 
 async function workWithSingleUser() { 
@@ -138,7 +136,7 @@ checkIfServerWork();
 //workWithSingleUser();
 //workWithMultipleUsers();
 //negativeTests();
-Test.endMessage();
+//Test.endMessage();
 
 function isEqual(object1: object, object2: object): Boolean {
     const keys1: Array<string> = Object.keys(object1);
