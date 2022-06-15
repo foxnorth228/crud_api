@@ -1,29 +1,7 @@
-import { sendRequestToServer } from "./testFunc.js";
+import { testRequestFunc } from "./testFunc.js";
 import { v4 } from "uuid";
 
-async function testRequestFunc(object: object={}, method: string="GET",
- path: string="api/users"): Promise<[number, string]> {
-    const [status, body] = await sendRequestToServer("localhost", 3000, path, method);
-    const reader = body.getReader();
-    let receivedLength = 0;
-    let chunks = []; 
-    while(true) {
-        const {done, value} = await reader.read();
-        if (done) {
-            break;
-        }
-        chunks.push(value);
-        receivedLength += value.length;
-    }
-    let chunksAll = new Uint8Array(receivedLength); // (4.1)
-    let position = 0;
-    for(let chunk of chunks) {
-        chunksAll.set(chunk, position); // (4.2)
-        position += chunk.length;
-    }
-    let result = new TextDecoder("utf-8").decode(chunksAll);
-    return [status, JSON.parse(result)];
-}
+
 
 type basicTypes = boolean | number | string | object;
 
@@ -84,40 +62,45 @@ class Test {
             Test.errorTest(err);
         }
     }
+
+    static async endMessage() {
+        console.log(`\nAll number of tests: ${Test.numTests}, \nSuccessful tests: ${Test.succeedTests}`);
+        console.log(`Failed tests: ${Test.failedTests}`);
+    }
 }
 
 async function checkIfServerWork() {
-    await Test.testAsyncFunction(testRequestFunc, [404, {}], {}, "GET");
+    await Test.testAsyncFunction(testRequestFunc, [404, {}], "GET");
 }
 
 async function workWithSingleUser() { 
-    await testRequestFunc({}, "GET");
-    await testRequestFunc({}, "POST");
-    await testRequestFunc({}, "GET");
-    await testRequestFunc({}, "PUT");
-    await testRequestFunc({}, "GET");
-    await testRequestFunc({}, "DELETE");
-    await testRequestFunc({}, "GET");
+    await testRequestFunc("GET");
+    await testRequestFunc("POST");
+    await testRequestFunc("GET");
+    await testRequestFunc("PUT");
+    await testRequestFunc("GET");
+    await testRequestFunc("DELETE");
+    await testRequestFunc("GET");
 }
 
 async function workWithMultipleUsers() {
-    await testRequestFunc({}, "GET");
-    await testRequestFunc({}, "POST");
-    await testRequestFunc({}, "POST");
-    await testRequestFunc({}, "POST");
-    await testRequestFunc({}, "POST");
-    await testRequestFunc({}, "POST");
-    await testRequestFunc({}, "GET");
-    await testRequestFunc({}, "PUT");
-    await testRequestFunc({}, "PUT");
-    await testRequestFunc({}, "PUT");
-    await testRequestFunc({}, "GET");
-    await testRequestFunc({}, "DELETE");
-    await testRequestFunc({}, "DELETE");
-    await testRequestFunc({}, "GET");
-    await testRequestFunc({}, "DELETE");
-    await testRequestFunc({}, "DELETE");
-    await testRequestFunc({}, "DELETE");
+    await testRequestFunc("GET");
+    await testRequestFunc("POST");
+    await testRequestFunc("POST");
+    await testRequestFunc("POST");
+    await testRequestFunc("POST");
+    await testRequestFunc("POST");
+    await testRequestFunc("GET");
+    await testRequestFunc("PUT");
+    await testRequestFunc("PUT");
+    await testRequestFunc("PUT");
+    await testRequestFunc("GET");
+    await testRequestFunc("DELETE");
+    await testRequestFunc("DELETE");
+    await testRequestFunc("GET");
+    await testRequestFunc("DELETE");
+    await testRequestFunc("DELETE");
+    await testRequestFunc("DELETE");
 }
 
 async function negativeTests() {
@@ -135,7 +118,7 @@ async function negativeTests() {
     ]
     for await (let path of wrongPaths) {
         for await (let method of methods) {
-            await testRequestFunc({}, method, path);
+            await testRequestFunc(method, path);
         }
     }
 }
@@ -144,3 +127,25 @@ checkIfServerWork();
 //workWithSingleUser();
 //workWithMultipleUsers();
 //negativeTests();
+Test.endMessage();
+
+/*function isEqual(object1, object2) {
+  const props1 = Object.getOwnPropertyNames(object1);
+  const props2 = Object.getOwnPropertyNames(object2);
+
+  if (props1.length !== props2.length) {
+    return false;
+  }
+
+  for (let i = 0; i < props1.length; i += 1) {
+    const prop = props1[i];
+    const bothAreObjects = typeof(object1[prop]) === 'object' && typeof(object2[prop]) === 'object';
+
+    if ((!bothAreObjects && (object1[prop] !== object2[prop]))
+    || (bothAreObjects && !isEqual(object1[prop], object2[prop]))) {
+      return false;
+    }
+  }
+
+  return true;
+}*/
