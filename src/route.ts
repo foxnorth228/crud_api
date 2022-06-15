@@ -6,6 +6,10 @@ const route: object = {
     "/users/api": processUsersApi,
 };
 
+export async function processRequest(url: string, method: string, body: object) {
+    console.log(url, method, body);
+}
+
 function shareURL(url: string, method: string, body: object) {
 
 }

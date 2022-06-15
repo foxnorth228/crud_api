@@ -81,36 +81,37 @@ class Test {
 
 async function checkIfServerWork() {
     await Test.testAsyncFunction(testRequestFunc, [404, {}], "GET");
+    await Test.testAsyncFunction(testRequestFunc, [404, {}], "POST", {});
 }
 
 async function workWithSingleUser() { 
     await testRequestFunc("GET");
-    await testRequestFunc("POST");
+    await testRequestFunc("POST", {});
     await testRequestFunc("GET");
-    await testRequestFunc("PUT");
+    await testRequestFunc("PUT", {});
     await testRequestFunc("GET");
-    await testRequestFunc("DELETE");
+    await testRequestFunc("DELETE", {});
     await testRequestFunc("GET");
 }
 
 async function workWithMultipleUsers() {
     await testRequestFunc("GET");
-    await testRequestFunc("POST");
-    await testRequestFunc("POST");
-    await testRequestFunc("POST");
-    await testRequestFunc("POST");
-    await testRequestFunc("POST");
-    await testRequestFunc("GET");
-    await testRequestFunc("PUT");
-    await testRequestFunc("PUT");
-    await testRequestFunc("PUT");
-    await testRequestFunc("GET");
-    await testRequestFunc("DELETE");
-    await testRequestFunc("DELETE");
-    await testRequestFunc("GET");
-    await testRequestFunc("DELETE");
-    await testRequestFunc("DELETE");
-    await testRequestFunc("DELETE");
+    await testRequestFunc("POST", {});
+    await testRequestFunc("POST", {});
+    await testRequestFunc("POST", {});
+    await testRequestFunc("POST", {});
+    await testRequestFunc("POST", {});
+    await testRequestFunc("GET", {});
+    await testRequestFunc("PUT", {});
+    await testRequestFunc("PUT", {});
+    await testRequestFunc("PUT", {});
+    await testRequestFunc("GET", {});
+    await testRequestFunc("DELETE", {});
+    await testRequestFunc("DELETE", {});
+    await testRequestFunc("GET", {});
+    await testRequestFunc("DELETE", {});
+    await testRequestFunc("DELETE", {});
+    await testRequestFunc("DELETE", {});
 }
 
 async function negativeTests() {
@@ -128,7 +129,7 @@ async function negativeTests() {
     ]
     for await (let path of wrongPaths) {
         for await (let method of methods) {
-            await testRequestFunc(method, path);
+            await testRequestFunc(method, {}, path);
         }
     }
 }

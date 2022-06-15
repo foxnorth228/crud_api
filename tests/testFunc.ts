@@ -29,8 +29,12 @@ async function getResponsefromServer(url: string, options: object): Promise<[num
           res.on('data', (chunk) => {
             chunks += chunk;
           });
-          res.on('end', () => resolve([res.statusCode as number, JSON.parse(chunks)]))
+          res.on('end', () => {
+            console.log(chunks);
+            resolve([res.statusCode as number, JSON.parse(chunks)]);
+          });
       });
+      req.write(JSON.stringify({a: 2}));
       req.end();
     })
 }
@@ -57,7 +61,7 @@ async function readResponseBody(body: ReadableStream): Promise<object> {
     return JSON.parse(result);
 }
 
-export async function testRequestFunc(method: string="GET",
+export async function testRequestFunc(method: string="GET", object: object={},
  path: string="api/users"): Promise<[number, object]> {
     const [status, body] = await sendRequestToServer("localhost", 3000, path, method);
     return [status, body];
