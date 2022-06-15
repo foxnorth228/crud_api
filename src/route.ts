@@ -1,6 +1,5 @@
 import { v4, validate } from "uuid";
 import { URL } from "url";
-import { RandomUUIDOptions } from "crypto";
 
 const route: object = {
     "/users/api/:uuid": processUsersApiID,
@@ -16,12 +15,6 @@ interface IUser {
     name: string;
     age: number;
     hobbies: Array<string>;
-}
-
-const templateUser = {
-    name: "",
-    age: 0,
-    hobbies: [""]
 }
 
 function processUsersApi(url: string, id:string, method: string, body: object) {
@@ -42,26 +35,39 @@ function processUsersApiID(url: string, id: string, method: string, body: object
         case "GET": 
             if(!validate(id)) {
                 return [400, body];
-            } else if (checkElemInUserContainer(id)) {
-                return [201, body];
             } else {
-                return [404, body];
+                const user = checkElemInUserContainer(id);
+                if (user) {
+                    return [201, user];
+                } else {
+                    return [404, body];
+                }
             }
         case "PUT": 
             if(!validate(id)) {
                 return [400, body];
-            } else if (checkElemInUserContainer(id)) {
-                return [201, body];
             } else {
-                return [404, body];
+                const user = checkElemInUserContainer(id);
+                if (user) {
+                    const index = userContainer.findIndex((el) => el.id === user.id);
+                    userContainer.splice(index, 1, body as IUser);
+                    return [201, user];
+                } else {
+                    return [404, body];
+                }
             }
         case "DELETE": 
         if(!validate(id)) {
             return [400, body];
-        } else if (checkElemInUserContainer(id)) {
-            return [204, body];
         } else {
-            return [404, body];
+            const user = checkElemInUserContainer(id);
+            if (user) {
+                const index = userContainer.findIndex((el) => el.id === user.id);
+                userContainer.splice(index, 1);
+                return [204, user];
+            } else {
+                return [404, body];
+            }
         }
         default: break;
     }

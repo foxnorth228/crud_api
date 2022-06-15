@@ -1,4 +1,5 @@
 import { v4 } from "uuid";
+import { request } from "http";
 //type user = {id: };
 
 interface IStatus {
@@ -8,8 +9,18 @@ interface IStatus {
 
 async function sendRequestToServer(hostname: string="localhost", port:number=3000, 
     path: string="api/users", method: string): Promise<[number, ReadableStream]> {
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/json',
+      }
+    };
     const url = `http://${hostname}:${port}/${path}`;
     const answer = await fetch(url, { method: method }) as IStatus;
+    /*const req = request(url, options, async (req) => {
+      
+    });
+    req.end();*/
     return [answer.status, answer.body];
 }
 
