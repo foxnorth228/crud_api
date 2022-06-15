@@ -8,20 +8,31 @@ interface IStatus {
 }
 
 async function sendRequestToServer(hostname: string="localhost", port:number=3000, 
-    path: string="api/users", method: string): Promise<[number, ReadableStream]> {
+    path: string="api/users", method: string): Promise<[number, object]> {
     const options = {
-      method: 'POST',
+      method: method,
       headers: {
         'Content-Type': 'text/json',
       }
     };
     const url = `http://${hostname}:${port}/${path}`;
-    const answer = await fetch(url, { method: method }) as IStatus;
-    /*const req = request(url, options, async (req) => {
-      
-    });
-    req.end();*/
-    return [answer.status, answer.body];
+    //const answer = await fetch(url, { method: method }) as IStatus;
+    const answer = await getResponsefromServer(url, options);
+    return answer;
+}
+
+async function getResponsefromServer(url: string, options: object): Promise<[number, object]> {
+    return new Promise(resolve => {
+      const req = request(url, options, async (res) => {
+          let chunks = ""; 
+          res.setEncoding('utf8');
+          res.on('data', (chunk) => {
+            chunks += chunk;
+          });
+          res.on('end', () => resolve([res.statusCode as number, JSON.parse(chunks)]))
+      });
+      req.end();
+    })
 }
 
 async function readResponseBody(body: ReadableStream): Promise<object> {
@@ -49,6 +60,5 @@ async function readResponseBody(body: ReadableStream): Promise<object> {
 export async function testRequestFunc(method: string="GET",
  path: string="api/users"): Promise<[number, object]> {
     const [status, body] = await sendRequestToServer("localhost", 3000, path, method);
-    
-    return [status, await readResponseBody(body)];
+    return [status, body];
 }

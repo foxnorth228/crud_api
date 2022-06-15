@@ -8,9 +8,9 @@ app.on("request", (req, res) => {
     res.writeHead(404, {
         "Content-Type": "text/json"
     });
-    //console.log(req.headers);
+    console.log(req.headers);
     const url = (req.url) ? req.url : "";
-    console.log(new URL(url));
+    console.log(new URL(url, `http://${req.headers.host}`));
     res.end(JSON.stringify({}));
 });
 app.listen(process.env.PORT);

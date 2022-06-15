@@ -44,7 +44,7 @@ class Test {
 
     static async testAsyncFunction(func: Function, arr: basicTypes[], ...args: basicTypes[]) {
         try { 
-            const answer = await func(args); 
+            const answer = await func(...args); 
             if (answer.length != arr.length) {
                 Test.failedTestCount(arr, answer);
                 return;
@@ -68,7 +68,8 @@ class Test {
             }
             Test.succeedTest();
         } catch(err) {
-            Test.errorTest(err);
+            throw err;
+            //Test.errorTest(err);
         }
     }
 
