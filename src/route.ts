@@ -1,32 +1,58 @@
 import { v4, validate } from "uuid";
 import { URL } from "url";
+import path from "path";
 
-const route: object = {
-    "/api/users/:{uuid}": processUsersApiID,
+const routes: object = {
+    "/api/users/:uuid": processUsersApiID,
     "/api/users": processUsersApi,
 };
 
 const splitRoutes: Array<Array<string>> = [];
+for (let route of Object.keys(routes)) {
+    splitRoutes.push(route.split("/").filter((el) => Boolean(el)));
+}
 
 export async function processRequest(url: string, method: string, body: object) {
     console.log(url, method, body);
-    await shareURL(url);
+    const pathArr = await shareURL(url);
+    if(pathArr.length === 0) {
+        return [404, {}];
+    } else if(pathArr.length === 1) {
+        const path = "/" + pathArr[0].join("/");
+        console.log(path);
+        for (let [key, value] of Object.entries(routes)) {
+            if(key === path) {
+                console.log(key, value);
+                console.log(value(method, body));
+                return value(method, body);
+            }
+        }
+    } else {
+        throw new Error(`Exist more then 1 available route that can process this url:${url}`);
+    }
 }
 
 async function shareURL(url: string) {
     const elemsOfURL = url.split("/").slice(1);
     console.log(JSON.stringify(elemsOfURL));
-    let checkString = "";
-    let arrUrls = Object.keys(route);
-    for await (let elem of elemsOfURL) {
-        checkString += "/" + elem;
-        arrUrls = arrUrls.filter((el) => {
-            return el.startsWith(checkString);
-        });
+    let arrUrls: Array<Array<string>> = splitRoutes.map((arr) => {
+        return arr.slice(0);
+    });
+    arrUrls = arrUrls.filter((arr) => arr.length === elemsOfURL.length);
+    for (let i = 0; i < elemsOfURL.length; ++i) {
+        arrUrls.filter((arr) => checkRoutePath(arr[i], elemsOfURL[i]));
     }
     console.log(arrUrls);
+    console.log(splitRoutes);
+    return arrUrls;
 }
 
+function checkRoutePath(arr: string, getElem: string): Boolean {
+    switch(true) {
+        case arr.startsWith(":"): return typeof(getElem) === arr.slice(1);
+        default: return arr === getElem;
+    }
+}
 
 interface IUser {
     id: string;
@@ -35,12 +61,12 @@ interface IUser {
     hobbies: Array<string>;
 }
 
-function processUsersApi(url: string, id:string, method: string, body: object) {
+function processUsersApi(method: string, body: {id: string}) {
     switch(method) {
         case "GET": 
             return [200, userContainer];
         case "POST": 
-            if(!checkElemInUserContainer(id) && checkIfBodyValidate(body)) {
+            if(!checkElemInUserContainer(body.id) && checkIfBodyValidate(body)) {
                 return [201, body];
             }
             return [400, {}];
@@ -48,7 +74,7 @@ function processUsersApi(url: string, id:string, method: string, body: object) {
     }
 }
 
-function processUsersApiID(url: string, id: string, method: string, body: object) {
+function processUsersApiID(id: string, method: string, body: object) {
     switch(method) {
         case "GET": 
             if(!validate(id)) {

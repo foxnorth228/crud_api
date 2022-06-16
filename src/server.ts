@@ -7,20 +7,20 @@ const app: Server = createServer();
 app.on("request", async (req, res) => {
     try {
         //console.log(req.url);
-        res.writeHead(404, {
-            "Content-Type": "text/json"
-        });
         //console.log(req.headers);
-        const url = (req.url) ? req.url : "";
         //console.log(new URL(url, `http://${req.headers.host}`));
+        const url = (req.url) ? req.url : "";
         let body: object;
         if (req.method !== "GET") {
             body = await getbody(req);
         } else {
             body = {};
         }
-        await processRequest(url, req.method as string, body);
-        res.end(JSON.stringify({}));
+        const [code, answerBody] = await processRequest(url, req.method as string, body);
+        res.writeHead(code, {
+            "Content-Type": "text/json"
+        });
+        res.end(JSON.stringify(answerBody));
     } catch(err) {
         res.writeHead(500, {
             "Content-Type": "text/json"

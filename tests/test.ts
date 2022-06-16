@@ -79,7 +79,7 @@ class Test {
 
 async function checkIfServerWork() {
     await Test.testAsyncFunction(testRequestFunc, [404, {}], "GET");
-    await Test.testAsyncFunction(testRequestFunc, [404, {}], "POST", {aaa: 222});
+    //await Test.testAsyncFunction(testRequestFunc, [404, {}], "POST", {aaa: 222});
 }
 
 async function workWithSingleUser() { 
