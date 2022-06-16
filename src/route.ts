@@ -1,16 +1,14 @@
 import { v4, validate } from "uuid";
-import { URL } from "url";
-import path from "path";
 
 const routes: object = {
     "/api/users/:uuid": processUsersApiID,
     "/api/users": processUsersApi,
 };
-
 const splitRoutes: Array<Array<string>> = [];
 for (let route of Object.keys(routes)) {
     splitRoutes.push(route.split("/").filter((el) => Boolean(el)));
 }
+const userContainer: Array<IUser> = [];
 
 export async function processRequest(url: string, method: string, body: object) {
     console.log(url, method, body);
@@ -159,8 +157,5 @@ function checkIfBodyValidate(object: object): Boolean {
             }
         }
     }
-
     return true;
 }
-
-const userContainer: Array<IUser> = [];

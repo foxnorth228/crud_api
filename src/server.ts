@@ -6,9 +6,6 @@ import { URL } from "url";
 const app: Server = createServer();
 app.on("request", async (req, res) => {
     try {
-        //console.log(req.url);
-        //console.log(req.headers);
-        //console.log(new URL(url, `http://${req.headers.host}`));
         const url = (req.url) ? req.url : "";
         let body: object;
         if (req.method !== "GET") {
@@ -25,7 +22,7 @@ app.on("request", async (req, res) => {
         res.writeHead(500, {
             "Content-Type": "text/json"
         });
-        res.end(JSON.stringify({err}));
+        res.end(JSON.stringify(err));
     }
     
 });
@@ -39,7 +36,7 @@ async function getbody(res: IncomingMessage): Promise<Object> {
             chunks += chunk;
         })
         res.on('end', () => {
-            resolve(JSON.parse(chunks))
+            resolve(JSON.parse(chunks));
         });
     });
 }
