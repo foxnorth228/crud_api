@@ -72,6 +72,10 @@ function processUsersApi(method: string, body: object, url: string) {
                 return [201, elem];
             }
             return [400, {}];
+        case "DELETE":
+            console.log("DELETE")
+            userContainer.length = 0;
+            return [204, {}];
         default: break;
     }
 }
@@ -88,7 +92,7 @@ function processUsersApiID(method: string, body: object, url: string) {
                 if (user) {
                     return [200, user];
                 } else {
-                    return [404, body];
+                    return [404, {}];
                 }
             }
         case "PUT": 
@@ -98,10 +102,12 @@ function processUsersApiID(method: string, body: object, url: string) {
                 const user = checkElemInUserContainer(id);
                 if (user) {
                     const index = userContainer.findIndex((el) => el.id === user.id);
-                    userContainer.splice(index, 1, body as IUser);
-                    return [201, user];
+                    userContainer[index].name = user.name;
+                    userContainer[index].age = user.age;
+                    userContainer[index].hobbies = user.hobbies;
+                    return [200, userContainer[index]];
                 } else {
-                    return [404, body];
+                    return [404, {}];
                 }
             }
         case "DELETE": 

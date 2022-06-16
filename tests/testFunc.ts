@@ -15,20 +15,25 @@ async function sendRequestToServer(hostname: string="localhost", port:number=300
       }
     };
     const url = `http://${hostname}:${port}/${path}`;
-    return await getResponsefromServer(url, options, object);;
+    const [status, body] = await getResponsefromServer(url, options, object, method);
+    return [status, body]
 }
 
-async function getResponsefromServer(url: string, options: object, object: object): Promise<[number, object]> {
+async function getResponsefromServer(url: string, options: object, object: object, method: string): Promise<[number, object]> {
     return new Promise(resolve => {
         const req = request(url, options, async (res) => {
-            let chunks = ""; 
-            res.setEncoding('utf8');
-            res.on('data', (chunk) => {
-                chunks += chunk;
-            });
-            res.on('end', () => {
-                resolve([res.statusCode as number, JSON.parse(chunks)]);
-            });
+            if(method === "DELETE") {
+                resolve([res.statusCode as number, {}]);
+            } else {
+                let chunks = ""; 
+                res.setEncoding('utf8');
+                res.on('data', (chunk) => {
+                    chunks += chunk;
+                });
+                res.on('end', () => {
+                    resolve([res.statusCode as number, JSON.parse(chunks)]);
+                });
+            }
         });
         req.write(JSON.stringify(object));
         req.end();

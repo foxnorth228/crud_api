@@ -8,7 +8,7 @@ app.on("request", async (req, res) => {
     try {
         const url = (req.url) ? req.url : "";
         let body: object;
-        if (req.method !== "GET") {
+        if (req.method !== "GET" && req.method !== "DELETE") {
             body = await getbody(req);
         } else {
             body = {};
@@ -17,6 +17,7 @@ app.on("request", async (req, res) => {
         res.writeHead(code, {
             "Content-Type": "text/json"
         });
+        console.log("answer", answerBody)
         res.end(JSON.stringify(answerBody));
     } catch(err) {
         res.writeHead(500, {
