@@ -25,6 +25,9 @@ app.on("request", async (req, res) => {
         res.end(JSON.stringify(err));
     }
     
+}); 
+app.on("error", (err) => {
+    console.log(`Something in server is wrong: ${err.message})`);
 });
 app.listen(process.env.PORT);
 

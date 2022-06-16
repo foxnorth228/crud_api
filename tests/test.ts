@@ -49,6 +49,7 @@ class Test {
             }
             for (let i = 0; i < answer.length; ++i) {
                 if(arr[i] instanceof Object) {
+                    console.log("Object!!");
                     if (isEqual(arr[i] as Object, answer[i])) {
                         continue;
                     } else {
@@ -78,8 +79,15 @@ class Test {
 }
 
 async function checkIfServerWork() {
-    await Test.testAsyncFunction(testRequestFunc, [404, {}], "GET");
-    //await Test.testAsyncFunction(testRequestFunc, [404, {}], "POST", {aaa: 222});
+    await Test.testAsyncFunction(testRequestFunc, [200, []], "GET");
+    await Test.testAsyncFunction(testRequestFunc, [400, {}], "POST", { aaa: 222, bbb: 22 });
+    await Test.testAsyncFunction(testRequestFunc, [201, {name: 22,age: 22,hobbies: ["bear", "wine"]}],
+    "POST", {
+        name: "name",
+        age: 22,
+        hobbies: ["bear", "wine"]
+    });
+    await Test.testAsyncFunction(testRequestFunc, [200, [{name: "name",age: 22,hobbies: ["bear", "wine"]}]], "GET");
 }
 
 async function workWithSingleUser() { 
@@ -138,16 +146,31 @@ checkIfServerWork();
 //negativeTests();
 //Test.endMessage();
 
-function isEqual(object1: object, object2: object): Boolean {
-    const keys1: Array<string> = Object.keys(object1);
-    const keys2 = Object.keys(object2);
-    const values1 = Object.values(object1);
-    const values2 = Object.values(object2);
-    if (keys1.length !== keys2.length) {
-        return false;
+function isEqual(object1: Object, object2: Object): boolean {
+    const keys1 = Object.entries(object1);
+    const keys2 = Object.entries(object2);
+    console.log("objects", keys1, keys2)
+    let isInclude = true;
+    for(let i = 0; i < keys1.length; ++i) {
+        if (!isInclude) {
+            return false;
+        }
+        isInclude = false;
+        for(let j = 0; j < keys2.length; ++j) {
+            if (keys1[i][0] === keys2[j][0]) {
+                console.log(typeof(keys1[i][1]), typeof(keys2[j][1]));
+                if(typeof(keys1[i][1]) === "object") {
+                    isInclude = isEqual(keys1[i][1], keys2[j][1]);
+                    break;
+                } else if(typeof(keys1[i][1] === typeof(keys2[j][1]))) {
+                    isInclude = true;
+                    break;
+                }
+            } else {
+                isInclude = false;
+                break;
+            }
+        }
     }
-    for (let key1 in object1) {
-        console.log(key1);
-    }
-  return true;
+    return true;
 }

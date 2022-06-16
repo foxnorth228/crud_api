@@ -21,7 +21,6 @@ export async function processRequest(url: string, method: string, body: object) 
         for (let [key, value] of Object.entries(routes)) {
             if(key === path) {
                 console.log(key, value);
-                console.log(value(method, body));
                 return value(method, body);
             }
         }
@@ -59,13 +58,16 @@ interface IUser {
     hobbies: Array<string>;
 }
 
-function processUsersApi(method: string, body: {id: string}) {
+function processUsersApi(method: string, body: object) {
     switch(method) {
         case "GET": 
             return [200, userContainer];
         case "POST": 
-            if(!checkElemInUserContainer(body.id) && checkIfBodyValidate(body)) {
-                return [201, body];
+            console.log("POST ELEM");
+            if(checkIfBodyValidate(body)) {
+                const elem = Object.assign({id: v4()}, body) as IUser;
+                userContainer.push(elem);
+                return [201, elem];
             }
             return [400, {}];
         default: break;
