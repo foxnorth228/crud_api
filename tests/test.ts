@@ -42,14 +42,12 @@ class Test {
         Test.numTests++;
         try { 
             const answer = await func(...args); 
-            console.log(JSON.stringify(arr), JSON.stringify(answer));
             if (answer.length != arr.length) {
                 Test.failedTestCount(arr, answer);
                 return;
             }
             for (let i = 0; i < answer.length; ++i) {
                 if(arr[i] instanceof Object) {
-                    console.log("Object!!");
                     if (isEqual(arr[i] as Object, answer[i])) {
                         continue;
                     } else {
@@ -66,6 +64,7 @@ class Test {
                 }
             }
             Test.succeedTest();
+            return answer;
         } catch(err) {
             throw err;
             //Test.errorTest(err);
@@ -81,7 +80,7 @@ class Test {
 async function checkIfServerWork() {
     await Test.testAsyncFunction(testRequestFunc, [200, []], "GET");
     await Test.testAsyncFunction(testRequestFunc, [400, {}], "POST", { aaa: 222, bbb: 22 });
-    await Test.testAsyncFunction(testRequestFunc, [201, {name: 22,age: 22,hobbies: ["bear", "wine"]}],
+    await Test.testAsyncFunction(testRequestFunc, [201, {name: "",age: 22,hobbies: ["bear", "wine"]}],
     "POST", {
         name: "name",
         age: 22,
@@ -91,13 +90,25 @@ async function checkIfServerWork() {
 }
 
 async function workWithSingleUser() { 
-    await testRequestFunc("GET");
-    await testRequestFunc("POST", {});
-    await testRequestFunc("GET");
-    await testRequestFunc("PUT", {});
-    await testRequestFunc("GET");
-    await testRequestFunc("DELETE", {});
-    await testRequestFunc("GET");
+    const userContainer: Array<object> = [];
+    const oldUser = {
+        name: "name",
+        age: 22,
+        hobbies: ["bear", "wine"]
+    };
+    const newUser = {
+        name: "newName",
+        age: 16,
+        hobbies: ["rr", "ss"]
+    };
+    await Test.testAsyncFunction(testRequestFunc, [200, []], "GET");
+    let user =  await Test.testAsyncFunction(testRequestFunc, [201, oldUser], "POST", oldUser);
+    console.log(user, user[1].id);
+    await Test.testAsyncFunction(testRequestFunc, [200, user[1]], "GET", {}, `/api/users/${user[1].id}`);
+    //await Test.testAsyncFunction(testRequestFunc, [] ,"PUT", {});
+    //await Test.testAsyncFunction(testRequestFunc, [] ,"GET");
+    //await Test.testAsyncFunction(testRequestFunc, [], "DELETE", {});
+    //await Test.testAsyncFunction(testRequestFunc, [] ,"GET");
 }
 
 async function workWithMultipleUsers() {
@@ -140,8 +151,8 @@ async function negativeTests() {
     }
 }
 
-checkIfServerWork();
-//workWithSingleUser();
+//checkIfServerWork();
+workWithSingleUser();
 //workWithMultipleUsers();
 //negativeTests();
 //Test.endMessage();
@@ -149,7 +160,6 @@ checkIfServerWork();
 function isEqual(object1: Object, object2: Object): boolean {
     const keys1 = Object.entries(object1);
     const keys2 = Object.entries(object2);
-    console.log("objects", keys1, keys2)
     let isInclude = true;
     for(let i = 0; i < keys1.length; ++i) {
         if (!isInclude) {
@@ -158,18 +168,17 @@ function isEqual(object1: Object, object2: Object): boolean {
         isInclude = false;
         for(let j = 0; j < keys2.length; ++j) {
             if (keys1[i][0] === keys2[j][0]) {
-                console.log(typeof(keys1[i][1]), typeof(keys2[j][1]));
                 if(typeof(keys1[i][1]) === "object") {
                     isInclude = isEqual(keys1[i][1], keys2[j][1]);
                     break;
-                } else if(typeof(keys1[i][1] === typeof(keys2[j][1]))) {
+                } else if(typeof(keys1[i][1]) === typeof(keys2[j][1])) {
                     isInclude = true;
                     break;
+                } else {
+                    isInclude = false;
+                    break;
                 }
-            } else {
-                isInclude = false;
-                break;
-            }
+            } 
         }
     }
     return true;

@@ -6,7 +6,7 @@ const routes: object = {
 };
 const splitRoutes: Array<Array<string>> = [];
 for (let route of Object.keys(routes)) {
-    splitRoutes.push(route.split("/").filter((el) => Boolean(el)));
+    splitRoutes.push(route.split("/").filter((el) => el));
 }
 const userContainer: Array<IUser> = [];
 
@@ -21,7 +21,7 @@ export async function processRequest(url: string, method: string, body: object) 
         for (let [key, value] of Object.entries(routes)) {
             if(key === path) {
                 console.log(key, value);
-                return value(method, body);
+                return value(method, body, url);
             }
         }
     } else {
@@ -30,7 +30,8 @@ export async function processRequest(url: string, method: string, body: object) 
 }
 
 async function shareURL(url: string) {
-    const elemsOfURL = url.split("/").slice(1);
+    console.log(url)
+    const elemsOfURL = url.split("/").filter((el) => el);
     console.log(JSON.stringify(elemsOfURL));
     let arrUrls: Array<Array<string>> = splitRoutes.map((arr) => {
         return arr.slice(0);
@@ -44,9 +45,10 @@ async function shareURL(url: string) {
     return arrUrls;
 }
 
-function checkRoutePath(arr: string, getElem: string): Boolean {
+function checkRoutePath(arr: string, getElem: string): boolean {
+    console.log(arr,getElem)
     switch(true) {
-        case arr.startsWith(":"): return typeof(getElem) === arr.slice(1);
+        case arr.startsWith(":"): if(arr.slice(0) === "uuid") { return validate(getElem) };
         default: return arr === getElem;
     }
 }
@@ -58,7 +60,7 @@ interface IUser {
     hobbies: Array<string>;
 }
 
-function processUsersApi(method: string, body: object) {
+function processUsersApi(method: string, body: object, url: string) {
     switch(method) {
         case "GET": 
             return [200, userContainer];
@@ -74,7 +76,9 @@ function processUsersApi(method: string, body: object) {
     }
 }
 
-function processUsersApiID(id: string, method: string, body: object) {
+function processUsersApiID(method: string, body: object, url: string) {
+    const id = url.split("/").filter((el) => el)[2];
+    console.log(method, id);
     switch(method) {
         case "GET": 
             if(!validate(id)) {
@@ -82,7 +86,7 @@ function processUsersApiID(id: string, method: string, body: object) {
             } else {
                 const user = checkElemInUserContainer(id);
                 if (user) {
-                    return [201, user];
+                    return [200, user];
                 } else {
                     return [404, body];
                 }

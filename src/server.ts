@@ -22,6 +22,9 @@ app.on("request", async (req, res) => {
         res.writeHead(500, {
             "Content-Type": "text/json"
         });
+        if(err instanceof Error) {
+            console.log(err.message)
+        }
         res.end(JSON.stringify(err));
     }
     
