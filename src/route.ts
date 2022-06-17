@@ -11,16 +11,16 @@ for (let route of Object.keys(routes)) {
 const userContainer: Array<IUser> = [];
 
 export async function processRequest(url: string, method: string, body: object) {
-    console.log(url, method, body);
+    for (let i = 0; i < 2000000000; ++i) {
+        i += 1;
+    }
     const pathArr = await shareURL(url);
     if(pathArr.length === 0) {
         return [404, {}];
     } else if(pathArr.length === 1) {
         const path = "/" + pathArr[0].join("/");
-        console.log(path);
         for (let [key, value] of Object.entries(routes)) {
             if(key === path) {
-                console.log(key, value);
                 return value(method, body, url);
             }
         }
@@ -30,9 +30,7 @@ export async function processRequest(url: string, method: string, body: object) 
 }
 
 async function shareURL(url: string) {
-    console.log(url)
     const elemsOfURL = url.split("/").filter((el) => el);
-    console.log(JSON.stringify(elemsOfURL));
     let arrUrls: Array<Array<string>> = splitRoutes.map((arr) => {
         return arr.slice(0);
     });
@@ -40,13 +38,10 @@ async function shareURL(url: string) {
     for (let i = 0; i < elemsOfURL.length; ++i) {
         arrUrls = arrUrls.filter((arr) => checkRoutePath(arr[i], elemsOfURL[i]));
     }
-    console.log(arrUrls);
-    console.log(splitRoutes);
     return arrUrls;
 }
 
 function checkRoutePath(arr: string, getElem: string): boolean {
-    console.log(arr,getElem, arr === getElem, arr.slice(1), arr.slice(1) === "uuid")
     switch(true) {
         case arr.startsWith(":"): if(arr.slice(1) === "uuid") { return true };
         default: return arr === getElem;
@@ -65,7 +60,6 @@ function processUsersApi(method: string, body: object, url: string) {
         case "GET": 
             return [200, userContainer];
         case "POST": 
-            console.log("POST ELEM");
             if(checkIfBodyValidate(body)) {
                 const elem = Object.assign({id: v4()}, body) as IUser;
                 userContainer.push(elem);
@@ -73,7 +67,6 @@ function processUsersApi(method: string, body: object, url: string) {
             }
             return [400, {}];
         case "DELETE":
-            console.log("DELETE")
             userContainer.length = 0;
             return [204, {}];
         default: break;
@@ -82,7 +75,6 @@ function processUsersApi(method: string, body: object, url: string) {
 
 function processUsersApiID(method: string, body: object, url: string) {
     const id = url.split("/").filter((el) => el)[2];
-    console.log(method, id);
     switch(method) {
         case "GET": 
             if(!validate(id)) {
@@ -107,7 +99,6 @@ function processUsersApiID(method: string, body: object, url: string) {
                     userContainer[index].hobbies = user.hobbies;
                     return [200, userContainer[index]];
                 } else {
-                    console.log("WRONG PUT")
                     return [404, {}];
                 }
             }
@@ -121,7 +112,6 @@ function processUsersApiID(method: string, body: object, url: string) {
                 userContainer.splice(index, 1);
                 return [204, user];
             } else {
-                console.log("WRONG DELETE")
                 return [404, body];
             }
         }
@@ -149,7 +139,6 @@ function checkElemInUserContainer(id: string): IUser | null {
 }
 
 function checkIfBodyValidate(object: object): Boolean {
-    console.log("type: ", typeof(object))
     const templateUser = {
         name: "",
         age: 0,

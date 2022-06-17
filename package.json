@@ -7,7 +7,8 @@
     "test": "ts-node --esm tests/test.ts",
     "start": "ts-node --esm src/server.ts",
     "start:dev": "nodemon --esm src/server.ts",
-    "start:prod": ""
+    "start:prod": "",
+    "start:multi": "ts-node --esm src/multiprocServer.ts"
   },
   "author": "",
   "license": "ISC",
