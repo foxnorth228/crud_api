@@ -38,7 +38,7 @@ async function shareURL(url: string) {
     });
     arrUrls = arrUrls.filter((arr) => arr.length === elemsOfURL.length);
     for (let i = 0; i < elemsOfURL.length; ++i) {
-        arrUrls.filter((arr) => checkRoutePath(arr[i], elemsOfURL[i]));
+        arrUrls = arrUrls.filter((arr) => checkRoutePath(arr[i], elemsOfURL[i]));
     }
     console.log(arrUrls);
     console.log(splitRoutes);
@@ -46,9 +46,9 @@ async function shareURL(url: string) {
 }
 
 function checkRoutePath(arr: string, getElem: string): boolean {
-    console.log(arr,getElem)
+    console.log(arr,getElem, arr === getElem, arr.slice(1), arr.slice(1) === "uuid")
     switch(true) {
-        case arr.startsWith(":"): if(arr.slice(0) === "uuid") { return validate(getElem) };
+        case arr.startsWith(":"): if(arr.slice(1) === "uuid") { return true };
         default: return arr === getElem;
     }
 }
@@ -107,6 +107,7 @@ function processUsersApiID(method: string, body: object, url: string) {
                     userContainer[index].hobbies = user.hobbies;
                     return [200, userContainer[index]];
                 } else {
+                    console.log("WRONG PUT")
                     return [404, {}];
                 }
             }
@@ -120,10 +121,11 @@ function processUsersApiID(method: string, body: object, url: string) {
                 userContainer.splice(index, 1);
                 return [204, user];
             } else {
+                console.log("WRONG DELETE")
                 return [404, body];
             }
         }
-        default: break;
+        default: return [404, {}];
     }
 }
 
@@ -147,6 +149,7 @@ function checkElemInUserContainer(id: string): IUser | null {
 }
 
 function checkIfBodyValidate(object: object): Boolean {
+    console.log("type: ", typeof(object))
     const templateUser = {
         name: "",
         age: 0,

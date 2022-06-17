@@ -116,47 +116,60 @@ async function workWithMultipleUsers() {
     const userContainer = [{
         name: "",
         age: 0,
-        hobbies: [],
+        hobbies: [""],
     }, {
         name: "",
         age: 0,
-        hobbies: [],
+        hobbies: [""],
     }, {
         name: "",
         age: 0,
-        hobbies: [],
+        hobbies: [""],
     }, {
         name: "",
         age: 0,
-        hobbies: [],
+        hobbies: [""],
     }, {
         name: "",
         age: 0,
-        hobbies: [],
+        hobbies: [""],
     }];
     let user;
+    let userContainerID: Array<string> = [];
     await Test.testAsyncFunction(testRequestFunc, [200, []], "GET");
     user = await Test.testAsyncFunction(testRequestFunc, [201, userContainer[0]], "POST", userContainer[0]);
-    userContainer[0] = Object.assign({id: user[1].id}, userContainer[0]);
+    userContainerID.push(user[1].id);
     user = await Test.testAsyncFunction(testRequestFunc, [201, userContainer[1]], "POST", userContainer[1]);
-    userContainer[1] = Object.assign({id: user[1].id}, userContainer[1]);
+    userContainerID.push(user[1].id);
     user = await Test.testAsyncFunction(testRequestFunc, [201, userContainer[2]], "POST", userContainer[2]);
-    userContainer[2] = Object.assign({id: user[1].id}, userContainer[2]);
+    userContainerID.push(user[1].id);
     user = await Test.testAsyncFunction(testRequestFunc, [201, userContainer[3]], "POST", userContainer[3]);
-    userContainer[3] = Object.assign({id: user[1].id}, userContainer[3]);
+    userContainerID.push(user[1].id);
     user = await Test.testAsyncFunction(testRequestFunc, [201, userContainer[4]], "POST", userContainer[4]);
-    userContainer[4] = Object.assign({id: user[1].id}, userContainer[4]);    
+    userContainerID.push(user[1].id);   
     await Test.testAsyncFunction(testRequestFunc, [200, userContainer], "GET");
-    await testRequestFunc("PUT", {});
-    await testRequestFunc("PUT", {});
-    await testRequestFunc("PUT", {});
-    await testRequestFunc("GET", {});
-    await testRequestFunc("DELETE", {});
-    await testRequestFunc("DELETE", {});
-    await testRequestFunc("GET", {});
-    await testRequestFunc("DELETE", {});
-    await testRequestFunc("DELETE", {});
-    await testRequestFunc("DELETE", {});
+    userContainer[0].name = "name1";
+    userContainer[0].age = 24;
+    userContainer[0].hobbies = ["games", "programming"];
+    userContainer[1].name = "name2";
+    userContainer[1].age = 25;
+    userContainer[1].hobbies = ["games", "programming", "sport"];
+    userContainer[2].name = "name3";
+    userContainer[2].age = 26;
+    userContainer[2].hobbies = ["games", "programming", "aaaa"];
+    await Test.testAsyncFunction(testRequestFunc, [200, userContainer[0]], "PUT", userContainer[0], `/api/users/${userContainerID[0]}`);
+    await Test.testAsyncFunction(testRequestFunc, [200, userContainer[1]], "PUT", userContainer[1], `/api/users/${userContainerID[1]}`);
+    await Test.testAsyncFunction(testRequestFunc, [200, userContainer[2]], "PUT", userContainer[2], `/api/users/${userContainerID[2]}`);
+    await Test.testAsyncFunction(testRequestFunc, [200, userContainer], "GET");
+    await Test.testAsyncFunction(testRequestFunc, [204, {}], "DELETE", {}, `/api/users/${userContainerID[3]}`);
+    await Test.testAsyncFunction(testRequestFunc, [204, {}], "DELETE", {}, `/api/users/${userContainerID[4]}`);
+    userContainer.splice(3, 2);
+    await Test.testAsyncFunction(testRequestFunc, [200, userContainer], "GET");
+    await Test.testAsyncFunction(testRequestFunc, [204, {}], "DELETE", {}, `/api/users/${userContainerID[0]}`);
+    await Test.testAsyncFunction(testRequestFunc, [204, {}], "DELETE", {}, `/api/users/${userContainerID[1]}`);
+    await Test.testAsyncFunction(testRequestFunc, [204, {}], "DELETE", {}, `/api/users/${userContainerID[2]}`);
+    await Test.testAsyncFunction(testRequestFunc, [200, []], "GET");
+    await negativeTests();
 }
 
 async function negativeTests() {
@@ -168,15 +181,32 @@ async function negativeTests() {
     ];
     const methods = [
         "GET",
-        "POST",
-        "PUT",
-        "DELETE"
+        //"POST",
+        //"PUT",
+        //"DELETE"
     ]
-    for await (let path of wrongPaths) {
+    /*for await (let path of wrongPaths) {
         for await (let method of methods) {
-            await testRequestFunc(method, {}, path);
+            await Test.testAsyncFunction(testRequestFunc, [404, {}], method, {}, path);
         }
-    }
+    }*/
+    await Test.testAsyncFunction(testRequestFunc, [404, []], "GET", {}, "api/");
+    await Test.testAsyncFunction(testRequestFunc, [404, []], "GET", {}, "api/u");
+    await Test.testAsyncFunction(testRequestFunc, [400, []], "GET", {}, "api/users/111");
+    await Test.testAsyncFunction(testRequestFunc, [404, []], "GET", {}, `api/users/${v4()}`);
+    await Test.testAsyncFunction(testRequestFunc, [404, {}], "POST", {}, "api/");
+    await Test.testAsyncFunction(testRequestFunc, [404, {}], "POST", {}, "api/u");
+    await Test.testAsyncFunction(testRequestFunc, [404, {}], "POST", {}, "api/users/111");
+    await Test.testAsyncFunction(testRequestFunc, [404, {}], "POST", {}, `api/users/${v4()}`);
+    await Test.testAsyncFunction(testRequestFunc, [400, {}], "POST", {}, `api/users`);
+    await Test.testAsyncFunction(testRequestFunc, [404, []], "PUT", {}, "api/");
+    await Test.testAsyncFunction(testRequestFunc, [404, []], "PUT", {}, "api/u");
+    await Test.testAsyncFunction(testRequestFunc, [400, []], "PUT", {}, "api/users/111");
+    await Test.testAsyncFunction(testRequestFunc, [404, []], "PUT", {}, `api/users/${v4()}`);
+    await Test.testAsyncFunction(testRequestFunc, [404, []], "DELETE", {}, "api/");
+    await Test.testAsyncFunction(testRequestFunc, [404, []], "DELETE", {}, "api/u");
+    await Test.testAsyncFunction(testRequestFunc, [400, []], "DELETE", {}, "api/users/111");
+    await Test.testAsyncFunction(testRequestFunc, [404, []], "DELETE", {}, `api/users/${v4()}`);
 }
 
 checkIfServerWork();
