@@ -3,6 +3,7 @@ import { processRequest } from"./route.js";
 import { Server, createServer, IncomingMessage } from "http";
 import { URL } from "url";
 import { cpus } from "os";
+import { get } from "http";
 import cluster from "cluster";
 import process from "process";
 
@@ -19,6 +20,11 @@ if (cluster.isPrimary) {
     cluster.on('exit', (worker, code, signal) => {
       console.log(`worker ${worker.process.pid} died`);
     });
+    setTimeout(()=>{
+        for (let i = 0; i < 20; i++) {
+          get('http://localhost:3000/api/users/', res => res.on('data', console.log))
+        }
+    }, 19000);
 } else {
     console.log(`Worker ${process.pid} is running`);
     const app: Server = createServer();

@@ -11,9 +11,6 @@ for (let route of Object.keys(routes)) {
 const userContainer: Array<IUser> = [];
 
 export async function processRequest(url: string, method: string, body: object) {
-    for (let i = 0; i < 2000000000; ++i) {
-        i += 1;
-    }
     const pathArr = await shareURL(url);
     if(pathArr.length === 0) {
         return [404, {}];

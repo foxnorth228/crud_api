@@ -1,5 +1,6 @@
 import "dotenv/config";
-import { processRequest } from"./route.js";
+// @ts-ignore
+import { processRequest } from"./route.ts";
 import { Server, createServer, IncomingMessage } from "http";
 import { URL } from "url";
 
@@ -34,6 +35,7 @@ app.on("error", (err) => {
     console.log(`Something in server is wrong: ${err.message})`);
 });
 app.listen(process.env.PORT);
+console.log(`The server started on port ${process.env.PORT}`);
 
 async function getbody(res: IncomingMessage): Promise<Object> {
     return new Promise(resolve => {
