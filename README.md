@@ -12,3 +12,4 @@ Simple CRUD server
     - "start:dev": start server in development with nodemon
     - "start:prod": webpack builds bundle into folder prod and then starts this bundle
     - "start:multi": start server with multiply workers that process requsts
+6. Users store in memory, without any files
