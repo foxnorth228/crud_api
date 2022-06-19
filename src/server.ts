@@ -4,7 +4,15 @@ import { processRequest } from"./route.ts";
 import process from "process";
 import { Server, createServer, IncomingMessage } from "http";
 
-export function startServer(startFunc: Function=startMessageFunction, requestFunc: Function=startMessageFunction) {
+interface IUser {
+    id: string;
+    name: string;
+    age: number;
+    hobbies: Array<string>;
+}
+
+export function startServer(userContainer: Array<IUser>,
+     startFunc: Function=startMessageFunction, requestFunc: Function=startMessageFunction) {
     if(startFunc && startFunc instanceof Function) {
         startFunc();
     }
@@ -22,7 +30,7 @@ export function startServer(startFunc: Function=startMessageFunction, requestFun
             } else {
                 body = {};
             }
-            const [code, answerBody] = await processRequest(url, req.method as string, body);
+            const [code, answerBody] = await processRequest(url, req.method as string, body, userContainer);
             res.writeHead(code, {
                 "Content-Type": "text/json"
             });

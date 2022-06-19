@@ -6,7 +6,13 @@ import process from "process";
 import { startServer } from "./server.ts";
 
 const numCPUs = cpus().length;
-
+interface IUser {
+    id: string;
+    name: string;
+    age: number;
+    hobbies: Array<string>;
+}
+const userContainer: Array<IUser> = [];
 if (cluster.isPrimary) {
     console.log(`Primary ${process.pid} is running`);
     const workers: Array<Worker> = [];
@@ -49,5 +55,5 @@ if (cluster.isPrimary) {
     function checkWorker() {
         console.log(`Worker ${process.pid} is processing request now`);
     }
-    startServer(runWorker, checkWorker);
+    startServer(userContainer, runWorker, checkWorker);
 }

@@ -8,9 +8,9 @@ const splitRoutes: Array<Array<string>> = [];
 for (let route of Object.keys(routes)) {
     splitRoutes.push(route.split("/").filter((el) => el));
 }
-const userContainer: Array<IUser> = [];
+//const userContainer: Array<IUser> = [];
 
-export async function processRequest(url: string, method: string, body: object) {
+export async function processRequest(url: string, method: string, body: object, userContainer: Array<IUser>) {
     const pathArr = await shareURL(url);
     if(pathArr.length === 0) {
         return [404, {}];
@@ -18,7 +18,7 @@ export async function processRequest(url: string, method: string, body: object) 
         const path = "/" + pathArr[0].join("/");
         for (let [key, value] of Object.entries(routes)) {
             if(key === path) {
-                return value(method, body, url);
+                return value(method, body, url, userContainer);
             }
         }
     } else {
@@ -52,7 +52,7 @@ interface IUser {
     hobbies: Array<string>;
 }
 
-function processUsersApi(method: string, body: object, url: string): [number, object]  {
+function processUsersApi(method: string, body: object, url: string, userContainer: Array<IUser>): [number, object]  {
     switch(method) {
         case "GET": 
             return [200, userContainer];
@@ -71,14 +71,14 @@ function processUsersApi(method: string, body: object, url: string): [number, ob
     }
 }
 
-function processUsersApiID(method: string, body: object, url: string): [number, object] {
+function processUsersApiID(method: string, body: object, url: string, userContainer: Array<IUser>): [number, object] {
     const id = url.split("/").filter((el) => el)[2];
     switch(method) {
         case "GET": 
             if(!validate(id)) {
                 return [400, body];
             } else {
-                const user = checkElemInUserContainer(id);
+                const user = checkElemInUserContainer(id, userContainer);
                 if (user) {
                     return [200, user];
                 } else {
@@ -89,7 +89,7 @@ function processUsersApiID(method: string, body: object, url: string): [number, 
             if(!validate(id)) {
                 return [400, body];
             } else {
-                const user = checkElemInUserContainer(id);
+                const user = checkElemInUserContainer(id, userContainer);
                 if (user) {
                     const index = userContainer.findIndex((el) => el.id === user.id);
                     userContainer[index].name = user.name;
@@ -104,7 +104,7 @@ function processUsersApiID(method: string, body: object, url: string): [number, 
         if(!validate(id)) {
             return [400, body];
         } else {
-            const user = checkElemInUserContainer(id);
+            const user = checkElemInUserContainer(id, userContainer);
             if (user) {
                 const index = userContainer.findIndex((el) => el.id === user.id);
                 userContainer.splice(index, 1);
@@ -127,7 +127,7 @@ function User(name:string, age: number, hobbies: Array<string>) {
     return user;
 }
 
-function checkElemInUserContainer(id: string): IUser | null {
+function checkElemInUserContainer(id: string, userContainer: Array<IUser>): IUser | null {
     for (let elem of userContainer) {
         if (id === elem.id) {
             return Object.assign({}, elem);
