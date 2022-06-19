@@ -5,11 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "ts-node --esm tests/test.ts",
-    "start": "ts-node --esm src/server.ts",
-    "start:dev": "nodemon --esm src/server.ts",
+    "test:multi": "",
+    "start": "ts-node --esm src/singleServer.ts",
+    "start:dev": "nodemon --esm src/singleServer.ts",
     "start:prod": "webpack --config webpack.prod.cjs && node prod/bundle.cjs",
-    "start:multi": "ts-node --esm src/multiprocServer.ts",
-    "build:prod": ""
+    "start:multi": "ts-node --esm src/multiprocServer.ts"
   },
   "author": "",
   "license": "ISC",
