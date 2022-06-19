@@ -4,11 +4,15 @@ import { processRequest } from"./route.ts";
 import process from "process";
 import { Server, createServer, IncomingMessage } from "http";
 
-export function startServer() {
+export function startServer(func: Function=startMessageFunction) {
     const app: Server = createServer();
     app.on("request", async (req, res) => {
         try {
+            if(func && func instanceof Function) {
+                func();
+            }
             const url = (req.url) ? req.url : "";
+            console.log(`${req.method}  ${req.url}  HTTP/${req.httpVersion}`);
             let body: object;
             if (req.method !== "GET" && req.method !== "DELETE") {
                 body = await getbody(req);
@@ -35,7 +39,6 @@ export function startServer() {
         console.log(`Something in server is wrong: ${err.message})`);
     });
     app.listen(process.env.PORT);
-    console.log(`The server started on port ${process.env.PORT}`);
     process.on("SIGINT", () => {
         app.close();
         process.exit();
@@ -68,4 +71,8 @@ async function getbody(res: IncomingMessage): Promise<Object> {
             resolve(JSON.parse(chunks));
         });
     });
+}
+
+function startMessageFunction() {
+    console.log(`The server started on port ${process.env.PORT}`);
 }
