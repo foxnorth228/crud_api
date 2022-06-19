@@ -4,7 +4,7 @@ import { processRequest } from"./route.ts";
 import process from "process";
 import { Server, createServer, IncomingMessage } from "http";
 
-export function startServer(startFunc: Function=startMessageFunction, requestFunc: Function) {
+export function startServer(startFunc: Function=startMessageFunction, requestFunc: Function=startMessageFunction) {
     if(startFunc && startFunc instanceof Function) {
         startFunc();
     }
@@ -40,6 +40,7 @@ export function startServer(startFunc: Function=startMessageFunction, requestFun
     }); 
     app.on("error", (err) => {
         console.log(`Something in server is wrong: ${err.message})`);
+        throw err;
     });
     app.listen(process.env.PORT);
     process.on("SIGINT", () => {
