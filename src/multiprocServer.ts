@@ -1,4 +1,3 @@
-import "dotenv/config";
 import { cpus } from "os";
 import cluster from "cluster";
 import { Worker } from "cluster";

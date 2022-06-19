@@ -66,15 +66,14 @@ class Test {
             Test.succeedTest();
             return answer;
         } catch(err) {
-            throw err;
-            //Test.errorTest(err);
+            Test.errorTest(err);
         }
     }
 
-    /*static async endMessage() {
-        console.log(`\nAll number of tests: ${Test.numTests}, \nSuccessful tests: ${Test.succeedTests}`);
+    static async endMessage() {
+        console.log(`\nAll number of tests: ${Test.numTests} \nSuccessful tests: ${Test.succeedTests}`);
         console.log(`Failed tests: ${Test.failedTests}`);
-    }*/
+    }
 }
 
 async function checkIfServerWork() {
@@ -173,23 +172,6 @@ async function workWithMultipleUsers() {
 }
 
 async function negativeTests() {
-    const wrongPaths = [
-        "api/",
-        "api/u",
-        "api/users/111",
-        `api/users/${v4()}`
-    ];
-    const methods = [
-        "GET",
-        //"POST",
-        //"PUT",
-        //"DELETE"
-    ]
-    /*for await (let path of wrongPaths) {
-        for await (let method of methods) {
-            await Test.testAsyncFunction(testRequestFunc, [404, {}], method, {}, path);
-        }
-    }*/
     await Test.testAsyncFunction(testRequestFunc, [404, []], "GET", {}, "api/");
     await Test.testAsyncFunction(testRequestFunc, [404, []], "GET", {}, "api/u");
     await Test.testAsyncFunction(testRequestFunc, [400, []], "GET", {}, "api/users/111");
@@ -207,13 +189,10 @@ async function negativeTests() {
     await Test.testAsyncFunction(testRequestFunc, [404, []], "DELETE", {}, "api/u");
     await Test.testAsyncFunction(testRequestFunc, [400, []], "DELETE", {}, "api/users/111");
     await Test.testAsyncFunction(testRequestFunc, [404, []], "DELETE", {}, `api/users/${v4()}`);
+    Test.endMessage();
 }
 
 checkIfServerWork();
-//workWithSingleUser();
-//workWithMultipleUsers();
-//negativeTests();
-//Test.endMessage();
 
 function isEqual(object1: Object, object2: Object): boolean {
     const keys1 = Object.entries(object1);

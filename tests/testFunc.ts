@@ -1,9 +1,11 @@
-import { v4 } from "uuid";
+import "dotenv/config";
 import { request } from "http";
+
+const port = (process.env.PORT) ? Number(process.env.PORT) : 3000;
 
 export async function testRequestFunc(method: string="GET", object: object={},
     path: string="api/users"): Promise<[number, object]> {
-    return await sendRequestToServer("localhost", 3000, path, method, object);;
+    return await sendRequestToServer("localhost", port, path, method, object);;
 }
 
 async function sendRequestToServer(hostname: string="localhost", port:number=3000, 
@@ -39,27 +41,3 @@ async function getResponsefromServer(url: string, options: object, object: objec
         req.end();
     });
 }
-
-/*
-async function readResponseBody(body: ReadableStream): Promise<object> {
-    const reader = body.getReader();
-    let receivedLength = 0;
-    let chunks = []; 
-    while(true) {
-        const {done, value} = await reader.read();
-        if (done) {
-            break;
-        }
-        chunks.push(value);
-        receivedLength += value.length;
-    }
-    let chunksAll = new Uint8Array(receivedLength); // (4.1)
-    let position = 0;
-    for(let chunk of chunks) {
-        chunksAll.set(chunk, position); // (4.2)
-        position += chunk.length;
-    }
-    let result = new TextDecoder("utf-8").decode(chunksAll);
-    return JSON.parse(result);
-}
-*/
