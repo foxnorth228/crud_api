@@ -4,14 +4,25 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "ts-node --esm tests/test.ts",
+    "test:multi": "ts-node --esm tests/multiProcTests.ts",
+    "start": "ts-node --esm src/singleServer.ts",
+    "start:dev": "nodemon --esm src/singleServer.ts",
+    "start:prod": "webpack --config webpack.prod.cjs && node prod/bundle.cjs",
+    "start:multi": "ts-node --esm src/multiprocServer.ts"
   },
   "author": "",
   "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "dotenv": "^16.0.1"
+  },
   "devDependencies": {
     "@types/node": "^17.0.42",
-    "dotenv": "^16.0.1",
-    "eslint": "^8.17.0",
+    "ts-loader": "^9.3.0",
+    "webpack": "^5.73.0",
+    "webpack-cli": "^4.10.0",
+    "@types/uuid": "^8.3.4",
     "nodemon": "^2.0.16",
     "ts-node": "^10.8.1",
     "typescript": "^4.7.3",
