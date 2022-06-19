@@ -36,6 +36,9 @@ async function getResponsefromServer(url: string, options: object, object: objec
                     resolve([res.statusCode as number, JSON.parse(chunks)]);
                 });
             }
+        })
+        .on("error", (err) => {
+            console.log("You must started server before start by 'npm run start' this test");
         });
         req.write(JSON.stringify(object));
         req.end();
