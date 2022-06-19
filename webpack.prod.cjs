@@ -2,7 +2,7 @@ const path = require("path");
 
 module.exports = {
     target: "node",
-    entry: "./src/server.ts",
+    entry: "./src/singleServer.ts",
     output : {
         path: path.resolve(__dirname, "prod"),
         filename: "bundle.cjs"

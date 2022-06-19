@@ -4,12 +4,15 @@ import { processRequest } from"./route.ts";
 import process from "process";
 import { Server, createServer, IncomingMessage } from "http";
 
-export function startServer(func: Function=startMessageFunction) {
+export function startServer(startFunc: Function=startMessageFunction, requestFunc: Function) {
+    if(startFunc && startFunc instanceof Function) {
+        startFunc();
+    }
     const app: Server = createServer();
     app.on("request", async (req, res) => {
         try {
-            if(func && func instanceof Function) {
-                func();
+            if(requestFunc && requestFunc instanceof Function) {
+                requestFunc();
             }
             const url = (req.url) ? req.url : "";
             console.log(`${req.method}  ${req.url}  HTTP/${req.httpVersion}`);

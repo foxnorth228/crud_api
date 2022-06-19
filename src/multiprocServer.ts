@@ -44,9 +44,11 @@ if (cluster.isPrimary) {
         process.exit();
     });
 } else {
-    console.log(`Worker ${process.pid} is running`);
+    function runWorker() {
+        console.log(`Worker ${process.pid} is running`);
+    }
     function checkWorker() {
         console.log(`Worker ${process.pid} is processing request now`);
     }
-    startServer(checkWorker);
+    startServer(runWorker, checkWorker);
 }

@@ -52,7 +52,7 @@ interface IUser {
     hobbies: Array<string>;
 }
 
-function processUsersApi(method: string, body: object, url: string) {
+function processUsersApi(method: string, body: object, url: string): [number, object]  {
     switch(method) {
         case "GET": 
             return [200, userContainer];
@@ -66,11 +66,12 @@ function processUsersApi(method: string, body: object, url: string) {
         case "DELETE":
             userContainer.length = 0;
             return [204, {}];
-        default: break;
+        default: 
+            return [404, {}];
     }
 }
 
-function processUsersApiID(method: string, body: object, url: string) {
+function processUsersApiID(method: string, body: object, url: string): [number, object] {
     const id = url.split("/").filter((el) => el)[2];
     switch(method) {
         case "GET": 
